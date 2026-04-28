@@ -1,16 +1,68 @@
-﻿using System.Xml.Serialization;
+using System;
+using System.IO;
+using System.Xml.Serialization;
+
 public class FileClass
 {
-    private static Random rand = new Random();
+    private string _filePath;
+    private string _fileName;
+
+    public FileClass()
+    {
+        _filePath = Environment.CurrentDirectory;
+        _fileName = "file.txt";
+    }
+
+    public FileClass(string fileName)
+    {
+        _filePath = Environment.CurrentDirectory;
+        _fileName = fileName;
+    }
+
+    public FileClass(string filePath, string fileName)
+    {
+        _filePath = filePath;
+        _fileName = fileName;
+    }
+
+    public string FilePath
+    {
+        get 
+        { 
+            return _filePath; 
+        }
+        set 
+        { 
+            _filePath = value;
+        }
+    }
+
+    public string FileName
+    {
+        get 
+        { 
+            return _fileName; 
+        }
+        set 
+        { 
+            _fileName = value; 
+        }
+    }
+
+
+    public string FullPath
+    {
+        get 
+        { 
+            return Path.Combine(_filePath, _fileName); 
+        }
+    }
 
     // Заполнение файла случайными числами (по одному в строке)
-    public static void RandomFileOne
-        (string name = "file.txt", int count = 10, 
-        int min = -100, int max = 100)
+    public void RandomFileOne(int count = 10, int min = -100, int max = 100)
     {
-        string filePath = Path.Combine(Environment.CurrentDirectory, name);
         Random rand = new Random();
-        using (StreamWriter writer = new StreamWriter(filePath))
+        using (StreamWriter writer = new StreamWriter(FullPath))
         {
             for (int i = 0; i < count; i++)
             {
@@ -20,11 +72,10 @@ public class FileClass
     }
 
     // Сумма квадратов элементов
-    public static long SumOfSquares(string fileName = "file.txt")
+    public long SumOfSquares()
     {
-        string filePath = Path.Combine(Environment.CurrentDirectory, fileName);
         long sum = 0;
-        foreach (string line in File.ReadLines(filePath))
+        foreach (string line in File.ReadLines(FullPath))
         {
             if (int.TryParse(line.Trim(), out int number))
             {
@@ -34,13 +85,11 @@ public class FileClass
         return sum;
     }
 
-
     // Заполнение файла случайными числами (по несколько в строке)
-    public static void RandomFileSeveral
-        (string filePath, int lineCount, int numbersPerLine, 
-        int minValue = -100, int maxValue = 100)
+    public void RandomFileSeveral(int lineCount = 10, int numbersPerLine = 2, int minValue = -100, int maxValue = 100)
     {
-        using (StreamWriter writer = new StreamWriter(filePath))
+        Random rand = new Random();
+        using (StreamWriter writer = new StreamWriter(FullPath))
         {
             for (int i = 0; i < lineCount; i++)
             {
@@ -55,12 +104,12 @@ public class FileClass
     }
 
     // Вычислить произведение элементов
-    public static long ProductElements(string filePath)
+    public long ProductElements()
     {
         long product = 1;
         bool hasNumbers = false;
 
-        foreach (string line in File.ReadLines(filePath))
+        foreach (string line in File.ReadLines(FullPath))
         {
             string[] parts = line.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -82,14 +131,12 @@ public class FileClass
         {
             return 0;
         }
-
     }
 
-
     // Переписать в другой файл строки, имеющие заданную длину m
-    public static void CopyLinesOfLength(string sourceFile, string destFile, int targetLength)
+    public void CopyLinesOfLength(string destFile, int targetLength)
     {
-        using (StreamReader reader = new StreamReader(sourceFile))
+        using (StreamReader reader = new StreamReader(FullPath))
         using (StreamWriter writer = new StreamWriter(destFile))
         {
             string line;
@@ -104,9 +151,10 @@ public class FileClass
     }
 
     // Заполнение бинарного файла случайными числами
-    public static void BinaryFileRandom(string filePath, int count, int minValue = -100, int maxValue = 100)
+    public void BinaryFileRandom(int count = 10, int minValue = -100, int maxValue = 100)
     {
-        using (BinaryWriter writer = new BinaryWriter(File.Open(filePath, FileMode.Create)))
+        Random rand= new Random();
+        using (BinaryWriter writer = new BinaryWriter(File.Open(FullPath, FileMode.Create)))
         {
             for (int i = 0; i < count; i++)
             {
@@ -116,12 +164,12 @@ public class FileClass
     }
 
     // Вычислить произведение нечетных отрицательных компонент файла
-    public static long BinaryProductNegative(string filePath)
+    public long BinaryProductNegative()
     {
         long product = 1;
         bool hasNumbers = false;
 
-        using (BinaryReader reader = new BinaryReader(File.Open(filePath, FileMode.Open)))
+        using (BinaryReader reader = new BinaryReader(File.Open(FullPath, FileMode.Open)))
         {
             while (reader.BaseStream.Position < reader.BaseStream.Length)
             {
@@ -142,5 +190,213 @@ public class FileClass
         {
             return 0;
         }
-    }    
+    }
+
+    [Serializable]
+    public struct BaggageItem
+    {
+        public string _name;   // Наименование багажа
+        public double _weight; // Вес багажа
+
+        public BaggageItem(string name, double weight)
+        {
+            _name = name;
+            _weight = weight;
+        }
+
+        public override string ToString()
+        {
+            return $"{_name} ({_weight} кг)";
+        }
+    }
+
+    public struct PassengerBaggage
+    {
+        public int _passengerId;       // Идентификатор пассажира
+        public BaggageItem[] _items;   // Массив единиц багажа
+
+        public PassengerBaggage(int id, BaggageItem[] items)
+        {
+            _passengerId = id;
+            _items = items;
+        }
+
+        // Количество единиц багажа
+        public int ItemCount
+        {
+            get 
+            { 
+                if (_items != null)
+                {
+                    return _items.Length;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+
+        // Общая масса багажа
+        public double TotalWeight
+        {
+            get
+            {
+                if (_items == null)
+                {
+                    return 0;
+                }
+                double sum = 0;
+                foreach (var item in _items)
+                {
+                    sum += item._weight;
+                }
+                return sum;
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"Пассажир {_passengerId}: {ItemCount} единиц, общая масса {TotalWeight} кг";
+        }
+    }
+    public void CreateSampleFile()
+    {
+        PassengerBaggage[] passengers = new PassengerBaggage[]
+        {
+                new PassengerBaggage(1, new BaggageItem[]
+                {
+                    new BaggageItem("Чемодан", 15.5),
+                    new BaggageItem("Сумка", 5.2),
+                    new BaggageItem("Рюкзак", 3.8)
+                }),
+                new PassengerBaggage(2, new BaggageItem[]
+                {
+                    new BaggageItem("Чемодан", 12.0),
+                    new BaggageItem("Сумка", 4.5)
+                }),
+                new PassengerBaggage(3, new BaggageItem[]
+                {
+                    new BaggageItem("Коробка", 8.0),
+                    new BaggageItem("Чемодан", 18.0),
+                    new BaggageItem("Сумка", 6.0),
+                    new BaggageItem("Пакет", 2.0)
+                }),
+                new PassengerBaggage(4, new BaggageItem[]
+                {
+                    new BaggageItem("Рюкзак", 4.2)
+                }),
+                new PassengerBaggage(5, new BaggageItem[]
+                {
+                    new BaggageItem("Чемодан", 20.0),
+                    new BaggageItem("Коробка", 10.0),
+                    new BaggageItem("Сумка", 5.0)
+                }),
+                new PassengerBaggage(6, new BaggageItem[]
+                {
+                    new BaggageItem("Сумка", 3.0),
+                    new BaggageItem("Пакет", 1.5)
+                })
+        };
+
+        string fullPath = Path.Combine(_filePath, _fileName);
+
+        // Сериализация XML
+        XmlSerializer serializer = new XmlSerializer(typeof(PassengerBaggage[]));
+        using (FileStream fs = new FileStream(fullPath, FileMode.Create))
+        {
+            serializer.Serialize(fs, passengers);
+        }
+
+        Console.WriteLine($"Файл {fullPath} успешно создан с тестовыми данными"); 
+        
+    }
+
+    // Десериализация XML
+    public PassengerBaggage[] ReadPassengers()
+    {
+        string fullPath = Path.Combine(_filePath, _fileName);
+
+        XmlSerializer serializer = new XmlSerializer(typeof(PassengerBaggage[]));
+        using (FileStream fs = new FileStream(fullPath, FileMode.Open))
+        {
+            return (PassengerBaggage[])serializer.Deserialize(fs);
+        }
+    }
+
+    // Сериализация XML
+    public void WritePassengers(PassengerBaggage[] passengers)
+    {
+        string fullPath = Path.Combine(_filePath, _fileName);
+
+        XmlSerializer serializer = new XmlSerializer(typeof(PassengerBaggage[]));
+        using (FileStream fs = new FileStream(fullPath, FileMode.Create))
+        {
+            serializer.Serialize(fs, passengers);
+        }
+    }
+
+    public int CountMoreThanTwo()
+    {
+        PassengerBaggage[] passengers = ReadPassengers();
+        int count = 0;
+
+        foreach (var passenger in passengers)
+        {
+            if (passenger.ItemCount > 2)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    public int CountMorethanAverage()
+    {
+        PassengerBaggage[] passengers = ReadPassengers();
+
+        if (passengers.Length == 0)
+        {
+            return 0;
+        }
+
+        double sum = 0;
+        for (int i = 0; i < passengers.Length; i++)
+        {
+            sum += passengers[i].ItemCount;
+        }
+
+        double average = sum / passengers.Length;
+
+        Console.WriteLine($"Среднее количество единиц багажа: {average}");
+
+        int count = 0;
+        foreach (var passenger in passengers)
+        {
+            if (passenger.ItemCount > average)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    public void PrintAllPassengers()
+    {
+        PassengerBaggage[] passengers = ReadPassengers();
+
+        Console.WriteLine("\nИнформация о багаже пассажиров");
+        foreach (var passenger in passengers)
+        {
+            Console.WriteLine($"\nПассажир {passenger._passengerId}:");
+            for (int i = 0; i < passenger._items.Length; i++)
+            {
+                Console.WriteLine($"  {i + 1}. {passenger._items[i]}");
+            }
+            Console.WriteLine($"  Итого: {passenger.ItemCount} единиц, " +
+                $"{passenger.TotalWeight} кг");
+        }
+    }
 }
