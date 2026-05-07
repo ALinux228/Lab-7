@@ -9,19 +9,34 @@ public static class FileClass
 
     public static string FilePath
     {
-        get { return _filePath; }
-        set { _filePath = value; }
+        get 
+        { 
+            return _filePath; 
+        }
+        set 
+        { 
+            _filePath = value; 
+        }
     }
 
     public static string FileName
     {
-        get { return _fileName; }
-        set { _fileName = value; }
+        get 
+        { 
+            return _fileName; 
+        }
+        set 
+        { 
+            _fileName = value; 
+        }
     }
 
     public static string FullPath
     {
-        get { return Path.Combine(_filePath, _fileName); }
+        get 
+        { 
+            return Path.Combine(_filePath, _fileName);
+        }
     }
 
     // Заполнение файла случайными числами (по одному в строке)
