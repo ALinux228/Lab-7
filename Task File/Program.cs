@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Xml.Serialization;
 
@@ -7,10 +7,6 @@ class Program
     static void Main(string[] args)
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
-
-        FileClass textFile = new FileClass("test.txt");
-        FileClass binaryFile = new FileClass("data.bin");
-        FileClass baggageFile = new FileClass("baggage.xml");
 
         int choice;
 
@@ -38,32 +34,32 @@ class Program
             {
                 case 1:
                     Console.WriteLine("Сумма квадратов элементов\n");
-                    textFile.RandomFileOne(10, -10, 10);
+                    FileClass.RandomFileOne(10, -10, 10);
                     Console.WriteLine("Содержимое файла:");
-                    foreach (string line in File.ReadLines(textFile.FullPath))
+                    foreach (string line in File.ReadLines(FileClass.FullPath))
                     {
                         Console.WriteLine($"  {line}");
                     }
-                    long sumSquares = textFile.SumOfSquares();
+                    long sumSquares = FileClass.SumOfSquares();
                     Console.WriteLine($"\nСумма квадратов элементов: {sumSquares}");
                     break;
 
                 case 2:
                     Console.WriteLine("Произведение элементов\n");
-                    textFile.RandomFileSeveral(5, 3, -5, 5);
+                    FileClass.RandomFileSeveral(5, 3, -5, 5);
                     Console.WriteLine("Содержимое файла:");
-                    foreach (string line in File.ReadLines(textFile.FullPath))
+                    foreach (string line in File.ReadLines(FileClass.FullPath))
                     {
                         Console.WriteLine($"  {line}");
                     }
-                    long product = textFile.ProductElements();
+                    long product = FileClass.ProductElements();
                     Console.WriteLine($"\nПроизведение всех элементов: {product}");
                     break;
 
                 case 3:
                     Console.WriteLine("Копирование строк заданной длины\n");
-                    string sourceFile = textFile.FullPath;
-                    string destFile = Path.Combine(textFile.FilePath, "filtered.txt");
+                    string sourceFile = FileClass.FullPath;
+                    string destFile = Path.Combine(FileClass.FilePath, "filtered.txt");
 
                     using (StreamWriter writer = new StreamWriter(sourceFile))
                     {
@@ -84,7 +80,7 @@ class Program
                     Console.Write("\nВведите длину строки для копирования: ");
                     if (int.TryParse(Console.ReadLine(), out int targetLength))
                     {
-                        textFile.CopyLinesOfLength(destFile, targetLength);
+                        FileClass.CopyLinesOfLength(destFile, targetLength);
                         Console.WriteLine($"\nСтроки длиной {targetLength} скопированы в {destFile}");
 
                         if (File.Exists(destFile))
@@ -100,9 +96,9 @@ class Program
 
                 case 4:
                     Console.WriteLine("Произведение нечётных отрицательных компонент\n");
-                    binaryFile.BinaryFileRandom(15, -20, 20);
+                    FileClass.BinaryFileRandom(15, -20, 20);
                     Console.WriteLine("Содержимое бинарного файла:");
-                    using (BinaryReader reader = new BinaryReader(File.Open(binaryFile.FullPath, FileMode.Open)))
+                    using (BinaryReader reader = new BinaryReader(File.Open(FileClass.FullPath, FileMode.Open)))
                     {
                         int index = 1;
                         while (reader.BaseStream.Position < reader.BaseStream.Length)
@@ -111,20 +107,20 @@ class Program
                             Console.WriteLine($"  {index++}. {number}");
                         }
                     }
-                    long negativeProduct = binaryFile.BinaryProductNegative();
+                    long negativeProduct = FileClass.BinaryProductNegative();
                     Console.WriteLine($"\nПроизведение нечётных отрицательных компонент: {negativeProduct}");
                     break;
 
                 case 5:
                     Console.WriteLine("Задача о багаже\n");
-                    baggageFile.CreateSampleFile();
-                    baggageFile.PrintAllPassengers();
+                    FileClass.CreateSampleFile();
+                    FileClass.PrintAllPassengers();
 
                     Console.WriteLine("\nРезультаты анализа");
-                    int moreThanTwo = baggageFile.CountMoreThanTwo();
+                    int moreThanTwo = FileClass.CountMoreThanTwo();
                     Console.WriteLine($"Число пассажиров, имеющих более двух единиц багажа: {moreThanTwo}");
 
-                    int aboveAverage = baggageFile.CountMorethanAverage();
+                    int aboveAverage = FileClass.CountMorethanAverage();
                     Console.WriteLine($"Число пассажиров, количество единиц багажа которых превосходит среднее: {aboveAverage}");
                     break;
 
