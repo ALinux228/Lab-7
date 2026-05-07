@@ -1,68 +1,35 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Xml.Serialization;
 
-public class FileClass
+public static class FileClass
 {
-    private string _filePath;
-    private string _fileName;
+    private static string _filePath = Environment.CurrentDirectory;
+    private static string _fileName = "file.txt";
 
-    public FileClass()
+    public static string FilePath
     {
-        _filePath = Environment.CurrentDirectory;
-        _fileName = "file.txt";
+        get { return _filePath; }
+        set { _filePath = value; }
     }
 
-    public FileClass(string fileName)
+    public static string FileName
     {
-        _filePath = Environment.CurrentDirectory;
-        _fileName = fileName;
+        get { return _fileName; }
+        set { _fileName = value; }
     }
 
-    public FileClass(string filePath, string fileName)
+    public static string FullPath
     {
-        _filePath = filePath;
-        _fileName = fileName;
-    }
-
-    public string FilePath
-    {
-        get 
-        { 
-            return _filePath; 
-        }
-        set 
-        { 
-            _filePath = value;
-        }
-    }
-
-    public string FileName
-    {
-        get 
-        { 
-            return _fileName; 
-        }
-        set 
-        { 
-            _fileName = value; 
-        }
-    }
-
-
-    public string FullPath
-    {
-        get 
-        { 
-            return Path.Combine(_filePath, _fileName); 
-        }
+        get { return Path.Combine(_filePath, _fileName); }
     }
 
     // Заполнение файла случайными числами (по одному в строке)
-    public void RandomFileOne(int count = 10, int min = -100, int max = 100)
+    public static void RandomFileOne(int count = 10, int min = -100, int max = 100)
     {
         Random rand = new Random();
-        using (StreamWriter writer = new StreamWriter(FullPath))
+        string fullPath = Path.Combine(_filePath, _fileName);
+        using (StreamWriter writer = new StreamWriter(fullPath))
         {
             for (int i = 0; i < count; i++)
             {
@@ -72,7 +39,7 @@ public class FileClass
     }
 
     // Сумма квадратов элементов
-    public long SumOfSquares()
+    public static long SumOfSquares()
     {
         long sum = 0;
         foreach (string line in File.ReadLines(FullPath))
@@ -86,7 +53,7 @@ public class FileClass
     }
 
     // Заполнение файла случайными числами (по несколько в строке)
-    public void RandomFileSeveral(int lineCount = 10, int numbersPerLine = 2, int minValue = -100, int maxValue = 100)
+    public static void RandomFileSeveral(int lineCount = 10, int numbersPerLine = 2, int minValue = -100, int maxValue = 100)
     {
         Random rand = new Random();
         using (StreamWriter writer = new StreamWriter(FullPath))
@@ -96,7 +63,10 @@ public class FileClass
                 for (int j = 0; j < numbersPerLine; j++)
                 {
                     writer.Write(rand.Next(minValue, maxValue + 1));
-                    if (j < numbersPerLine - 1) writer.Write(" ");
+                    if (j < numbersPerLine - 1)
+                    {
+                        writer.Write(" ");
+                    }
                 }
                 writer.WriteLine();
             }
@@ -104,7 +74,7 @@ public class FileClass
     }
 
     // Вычислить произведение элементов
-    public long ProductElements()
+    public static long ProductElements()
     {
         long product = 1;
         bool hasNumbers = false;
@@ -134,7 +104,7 @@ public class FileClass
     }
 
     // Переписать в другой файл строки, имеющие заданную длину m
-    public void CopyLinesOfLength(string destFile, int targetLength)
+    public static void CopyLinesOfLength(string destFile, int targetLength)
     {
         using (StreamReader reader = new StreamReader(FullPath))
         using (StreamWriter writer = new StreamWriter(destFile))
@@ -151,9 +121,9 @@ public class FileClass
     }
 
     // Заполнение бинарного файла случайными числами
-    public void BinaryFileRandom(int count = 10, int minValue = -100, int maxValue = 100)
+    public static void BinaryFileRandom(int count = 10, int minValue = -100, int maxValue = 100)
     {
-        Random rand= new Random();
+        Random rand = new Random();
         using (BinaryWriter writer = new BinaryWriter(File.Open(FullPath, FileMode.Create)))
         {
             for (int i = 0; i < count; i++)
@@ -164,7 +134,7 @@ public class FileClass
     }
 
     // Вычислить произведение нечетных отрицательных компонент файла
-    public long BinaryProductNegative()
+    public static long BinaryProductNegative()
     {
         long product = 1;
         bool hasNumbers = false;
@@ -195,8 +165,8 @@ public class FileClass
     [Serializable]
     public struct BaggageItem
     {
-        public string _name;   // Наименование багажа
-        public double _weight; // Вес багажа
+        public string _name;
+        public double _weight;
 
         public BaggageItem(string name, double weight)
         {
@@ -210,10 +180,11 @@ public class FileClass
         }
     }
 
+    [Serializable]
     public struct PassengerBaggage
     {
-        public int _passengerId;       // Идентификатор пассажира
-        public BaggageItem[] _items;   // Массив единиц багажа
+        public int _passengerId;
+        public BaggageItem[] _items;
 
         public PassengerBaggage(int id, BaggageItem[] items)
         {
@@ -221,11 +192,10 @@ public class FileClass
             _items = items;
         }
 
-        // Количество единиц багажа
         public int ItemCount
         {
-            get 
-            { 
+            get
+            {
                 if (_items != null)
                 {
                     return _items.Length;
@@ -237,7 +207,6 @@ public class FileClass
             }
         }
 
-        // Общая масса багажа
         public double TotalWeight
         {
             get
@@ -260,63 +229,59 @@ public class FileClass
             return $"Пассажир {_passengerId}: {ItemCount} единиц, общая масса {TotalWeight} кг";
         }
     }
-    public void CreateSampleFile()
+
+    public static void CreateSampleFile()
     {
         PassengerBaggage[] passengers = new PassengerBaggage[]
         {
-                new PassengerBaggage(1, new BaggageItem[]
-                {
-                    new BaggageItem("Чемодан", 15.5),
-                    new BaggageItem("Сумка", 5.2),
-                    new BaggageItem("Рюкзак", 3.8)
-                }),
-                new PassengerBaggage(2, new BaggageItem[]
-                {
-                    new BaggageItem("Чемодан", 12.0),
-                    new BaggageItem("Сумка", 4.5)
-                }),
-                new PassengerBaggage(3, new BaggageItem[]
-                {
-                    new BaggageItem("Коробка", 8.0),
-                    new BaggageItem("Чемодан", 18.0),
-                    new BaggageItem("Сумка", 6.0),
-                    new BaggageItem("Пакет", 2.0)
-                }),
-                new PassengerBaggage(4, new BaggageItem[]
-                {
-                    new BaggageItem("Рюкзак", 4.2)
-                }),
-                new PassengerBaggage(5, new BaggageItem[]
-                {
-                    new BaggageItem("Чемодан", 20.0),
-                    new BaggageItem("Коробка", 10.0),
-                    new BaggageItem("Сумка", 5.0)
-                }),
-                new PassengerBaggage(6, new BaggageItem[]
-                {
-                    new BaggageItem("Сумка", 3.0),
-                    new BaggageItem("Пакет", 1.5)
-                })
+            new PassengerBaggage(1, new BaggageItem[]
+            {
+                new BaggageItem("Чемодан", 15.5),
+                new BaggageItem("Сумка", 5.2),
+                new BaggageItem("Рюкзак", 3.8)
+            }),
+            new PassengerBaggage(2, new BaggageItem[]
+            {
+                new BaggageItem("Чемодан", 12.0),
+                new BaggageItem("Сумка", 4.5)
+            }),
+            new PassengerBaggage(3, new BaggageItem[]
+            {
+                new BaggageItem("Коробка", 8.0),
+                new BaggageItem("Чемодан", 18.0),
+                new BaggageItem("Сумка", 6.0),
+                new BaggageItem("Пакет", 2.0)
+            }),
+            new PassengerBaggage(4, new BaggageItem[]
+            {
+                new BaggageItem("Рюкзак", 4.2)
+            }),
+            new PassengerBaggage(5, new BaggageItem[]
+            {
+                new BaggageItem("Чемодан", 20.0),
+                new BaggageItem("Коробка", 10.0),
+                new BaggageItem("Сумка", 5.0)
+            }),
+            new PassengerBaggage(6, new BaggageItem[]
+            {
+                new BaggageItem("Сумка", 3.0),
+                new BaggageItem("Пакет", 1.5)
+            })
         };
 
         string fullPath = Path.Combine(_filePath, _fileName);
-
-        // Сериализация XML
         XmlSerializer serializer = new XmlSerializer(typeof(PassengerBaggage[]));
         using (FileStream fs = new FileStream(fullPath, FileMode.Create))
         {
             serializer.Serialize(fs, passengers);
         }
 
-        Console.WriteLine($"Файл {fullPath} успешно создан с тестовыми данными"); 
-        
+        Console.WriteLine($"Файл {fullPath} успешно создан с тестовыми данными");
     }
 
-    // Десериализация XML
-    public PassengerBaggage[] ReadPassengers()
+    public static PassengerBaggage[] ReadPassengers()
     {
         string fullPath = Path.Combine(_filePath, _fileName);
-
         XmlSerializer serializer = new XmlSerializer(typeof(PassengerBaggage[]));
         using (FileStream fs = new FileStream(fullPath, FileMode.Open))
         {
@@ -324,11 +289,9 @@ public class FileClass
         }
     }
 
-    // Сериализация XML
-    public void WritePassengers(PassengerBaggage[] passengers)
+    public static void WritePassengers(PassengerBaggage[] passengers)
     {
         string fullPath = Path.Combine(_filePath, _fileName);
-
         XmlSerializer serializer = new XmlSerializer(typeof(PassengerBaggage[]));
         using (FileStream fs = new FileStream(fullPath, FileMode.Create))
         {
@@ -336,7 +299,7 @@ public class FileClass
         }
     }
 
-    public int CountMoreThanTwo()
+    public static int CountMoreThanTwo()
     {
         PassengerBaggage[] passengers = ReadPassengers();
         int count = 0;
@@ -352,7 +315,7 @@ public class FileClass
         return count;
     }
 
-    public int CountMorethanAverage()
+    public static int CountMorethanAverage()
     {
         PassengerBaggage[] passengers = ReadPassengers();
 
@@ -383,7 +346,7 @@ public class FileClass
         return count;
     }
 
-    public void PrintAllPassengers()
+    public static void PrintAllPassengers()
     {
         PassengerBaggage[] passengers = ReadPassengers();
 
